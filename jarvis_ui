@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Console</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background-color: #050a0f; color: #00f2ff; font-family: monospace; display: flex; flex-direction: column; align-items: center; height: 100vh; margin: 0; }
+        .console { border: 2px solid #00f2ff; box-shadow: 0 0 15px #00f2ff; width: 90%; margin-top: 20px; padding: 15px; border-radius: 10px; background: rgba(0, 242, 255, 0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { background: transparent; border: 1px solid #00f2ff; color: #00f2ff; padding: 15px; text-transform: uppercase; cursor: pointer; box-shadow: inset 0 0 5px #00f2ff; }
+        button:active { background: #00f2ff; color: #000; }
+    </style>
+</head>
+<body>
+    <div class="console">
+        <h2 style="text-align:center; letter-spacing:3px;">JARVIS OS</h2>
+        <div class="grid">
+            <button onclick="send('🛡️ Rogue')">Rogue</button>
+            <button onclick="send('📈 Health')">Health</button>
+            <button onclick="send('🚀 Speed')">Speed</button>
+            <button onclick="send('📡 OLT STATUS')">Status</button>
+        </div>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        function send(cmd) { tg.sendData(cmd); tg.close(); }
+    </script>
+</body>
+</html>
