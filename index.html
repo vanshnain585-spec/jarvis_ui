@@ -1,241 +1,82 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FRIDAY High-Tech Console</title>
-<style>
-  :root {
-    --core-color: #00f2fe;
-    --core-glow: #4facfe;
-    --bg-color: #010810;
-    --panel-color: #021a30;
-    --text-color: #88c0d0;
-    --button-bg: #032a4a;
-    --button-hover: #054a7d;
-    --alert-color: #ff3333;
-    --vault-locked: #00ff88;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FRIDAY Console</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow-x: hidden; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        /* Status Card - Compact for Mobile */
+        .status-card {
+            border: 2px solid #00f2ff; padding: 10px; width: 95%; 
+            border-radius: 10px; box-shadow: 0 0 15px #00f2ff; margin-bottom: 20px;
+            font-size: 12px; background: rgba(0, 242, 255, 0.05);
+        }
+        
+        /* Button Grid - Responsive */
+        .grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; width: 100%; max-width: 400px;
+        }
+        
+        button {
+            background: transparent; border: 1px solid #00f2ff; color: #00f2ff;
+            padding: 12px 5px; font-size: 10px; border-radius: 5px;
+            cursor: pointer; transition: 0.3s; text-transform: uppercase;
+        }
+        
+        button:active { background: #00f2ff; color: #000; box-shadow: 0 0 20px #00f2ff; }
 
-  body {
-    background: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Courier New', Courier, monospace;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  /* 📦 मुख्य कंसोल पैनल */
-  .console-panel {
-    width: 90vw;
-    height: 90vh;
-    background: var(--panel-color);
-    border: 2px solid var(--core-color);
-    border-radius: 20px;
-    box-shadow: 0 0 50px rgba(79, 172, 254, 0.3);
-    display: grid;
-    grid-template-columns: 250px 1fr 250px;
-    grid-template-rows: 80px 1fr 120px;
-    gap: 15px;
-    padding: 15px;
-    position: relative;
-    backdrop-filter: blur(10px);
-  }
-
-  /* 🪐 FRIDAY CORE (Rotating 3D) */
-  .friday-core-container {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-
-  .friday-core {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff 10%, var(--core-color) 40%, transparent 70%);
-    box-shadow: 0 0 60px var(--core-glow);
-    animation: core-pulse 3s infinite alternate;
-  }
-
-  .core-ring {
-    width: 280px;
-    height: 280px;
-    border: 3px solid var(--core-color);
-    border-radius: 50%;
-    position: absolute;
-    animation: core-rotate 8s infinite linear;
-  }
-
-  .core-ring:nth-child(2) {
-    width: 310px;
-    height: 310px;
-    animation: core-rotate 6s infinite linear reverse;
-  }
-
-  @keyframes core-pulse {
-    0% { transform: scale(1); box-shadow: 0 0 60px var(--core-glow); }
-    100% { transform: scale(1.05); box-shadow: 0 0 90px var(--core-glow); }
-  }
-
-  @keyframes core-rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* 🔴 EMERGENCY WAVEFORM */
-  .alert-waveform {
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255, 51, 51, 0.2) 11px, rgba(255, 51, 51, 0.2) 12px);
-    position: absolute;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  /* 🛡️ MASTER VAULT STATUS */
-  .status-panel {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-    background: var(--button-bg);
-    border-radius: 10px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .vault-indicator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .status-led {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #555; /* Default: Locked */
-  }
-
-  .status-led.locked { background: var(--vault-locked); box-shadow: 0 0 15px var(--vault-locked); }
-
-  /* 🔘 3D NAVIGATION BUTTONS (16 Buttons Matrix) */
-  .nav-grid {
-    grid-column: 2 / 3;
-    grid-row: 3 / 4;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 10px;
-  }
-
-  .console-btn {
-    background: var(--button-bg);
-    border: 1px solid var(--core-color);
-    color: var(--core-color);
-    padding: 15px;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-  }
-
-  .console-btn:hover {
-    background: var(--button-hover);
-    transform: translateY(-3px);
-    box-shadow: 5px 5px 15px rgba(79, 172, 254, 0.5);
-  }
-
-  .console-btn.critical {
-    border-color: var(--alert-color);
-    color: var(--alert-color);
-  }
-
-  .console-btn.critical:hover {
-    background: rgba(255, 51, 51, 0.2);
-    box-shadow: 0 0 15px var(--alert-color);
-  }
-
-</style>
+        /* Logs Output */
+        #log-screen {
+            width: 95%; height: 80px; background: #050505; border: 1px solid #333;
+            margin-top: 20px; padding: 5px; font-size: 10px; color: #0f0; overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="status-card">
+            <h3 style="margin:0 0 10px 0; text-align:center;">SYSTEM STATUS</h3>
+            <div>• VAULT: <span style="color:#0f0">LOCKED</span></div>
+            <div>• GUARDIAN: <span style="color:#0f0">ACTIVE</span></div>
+            <div>• UPLINK: -17.5 dBm</div>
+        </div>
 
-<div class="alert-waveform" id="alertWaveform"></div>
+        <div class="grid">
+            <button onclick="sendCmd('PON P1')">PON P1</button>
+            <button onclick="sendCmd('PON P2')">PON P2</button>
+            <button onclick="sendCmd('PON P3')">PON P3</button>
+            <button onclick="sendCmd('PON P4')">PON P4</button>
+            <button onclick="sendCmd('HEALTH')">HEALTH</button>
+            <button onclick="sendCmd('SPEED')">SPEED</button>
+            <button onclick="sendCmd('STATS')">STATS</button>
+            <button onclick="sendCmd('ROGUE')">ROGUE</button>
+            <button onclick="sendCmd('SEARCH')">SEARCH</button>
+            <button onclick="sendCmd('SCAN P1')">SCAN P1</button>
+            <button onclick="sendCmd('SCAN P2')">SCAN P2</button>
+            <button onclick="sendCmd('CONFIRM')">CONFIRM</button>
+            <button onclick="sendCmd('RESCAN')">RESCAN</button>
+            <button onclick="sendCmd('ALARM')">ALARM</button>
+            <button onclick="sendCmd('EMERGENCY')">EMERGENCY</button>
+            <button onclick="sendCmd('MASTER')">MASTER</button>
+        </div>
 
-<div class="console-panel">
-  <div class="status-panel">
-    <h2>SYSTEM STATUS</h2>
-    <div class="vault-indicator">
-      <div class="status-led locked" id="vaultLED"></div>
-      <p>MASTER VAULT: <strong>LOCKED</strong></p>
+        <div id="log-screen">Ready for commands...</div>
     </div>
-    <div class="vault-indicator">
-      <div class="status-led locked"></div>
-      <p>SILENT GUARDIAN: ACTIVE</p>
-    </div>
-    <p>⚡ UPLINK: -17.5 dBm</p>
-    <p>🚨 ALARM: 2dB Drop (ACTIVE)</p>
-  </div>
 
-  <div class="friday-core-container">
-    <div class="friday-core"></div>
-    <div class="core-ring"></div>
-    <div class="core-ring"></div>
-  </div>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Full screen setup
 
-  <div class="nav-grid">
-    <button class="console-btn">PON P1</button>
-    <button class="console-btn">PON P2</button>
-    <button class="console-btn">PON P3</button>
-    <button class="console-btn">PON P4</button>
-    <button class="console-btn">UPLINK</button>
-    <button class="console-btn">HEALTH</button>
-    <button class="console-btn">SPEED</button>
-    <button class="console-btn">STATS</button>
-    <button class="console-btn">ROGUE</button>
-    <button class="console-btn">SEARCH</button>
-    <button class="console-btn">SCAN P1</button>
-    <button class="console-btn">SCAN P2</button>
-    <button class="console-btn">CONFIRM</button>
-    <button class="console-btn">RESCAN</button>
-    <button class="console-btn critical">ALARM ON</button>
-    <button class="console-btn critical">EMERGENCY</button>
-  </div>
-</div>
-
-<script>
-  // 🎙️ Friday's Activation Response (Voice)
-  window.onload = function() {
-    // यहाँ आप 'bot-9.py' से जनरेट किया हुआ वॉयस नोट प्ले करा सकते हैं
-    console.log("Friday Console Active.");
-  };
-
-  // 🚨 Emergency Siren (Example for critical buttons)
-  function triggerEmergencySiren() {
-    const waveform = document.getElementById('alertWaveform');
-    waveform.style.opacity = '1';
-    // 'bot-9.py' के trigger_red_alert को यहाँ कॉल करना होगा
-    setTimeout(() => { waveform.style.opacity = '0'; }, 3000);
-  }
-
-  // बस एक बटन के लिए डेमो
-  document.querySelectorAll('.console-btn.critical').forEach(btn => {
-    btn.addEventListener('click', triggerEmergencySiren);
-  });
-
-</script>
-
+        function sendCmd(cmd) {
+            document.getElementById('log-screen').innerHTML += "<br>> Executing: " + cmd;
+            // Sending data to Python Bot
+            tg.sendData(cmd); 
+        }
+    </script>
 </body>
 </html>
