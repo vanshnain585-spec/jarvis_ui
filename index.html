@@ -1,65 +1,241 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jarvis OS v2.0</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root { --neon: #00f3ff; --bg: #050a0f; }
-        body { background: var(--bg); color: white; font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow: hidden; }
-        .dashboard { border: 2px solid var(--neon); border-radius: 10px; padding: 15px; box-shadow: 0 0 20px rgba(0,243,255,0.2); height: 95vh; display: flex; flex-direction: column; }
-        .header { text-align: center; border-bottom: 1px solid var(--neon); padding-bottom: 10px; margin-bottom: 15px; letter-spacing: 5px; color: var(--neon); font-weight: bold; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex-shrink: 0; }
-        .btn { background: rgba(0,243,255,0.05); border: 1px solid var(--neon); color: var(--neon); padding: 12px; border-radius: 5px; text-align: center; font-size: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
-        .btn:active { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); }
-        #terminal { margin-top: 15px; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 10px; font-size: 11px; flex-grow: 1; overflow-y: auto; color: #0f0; }
-        .cursor { display: inline-block; width: 8px; height: 15px; background: #0f0; animation: blink 1s infinite; vertical-align: middle; }
-        @keyframes blink { 50% { opacity: 0; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRIDAY High-Tech Console</title>
+<style>
+  :root {
+    --core-color: #00f2fe;
+    --core-glow: #4facfe;
+    --bg-color: #010810;
+    --panel-color: #021a30;
+    --text-color: #88c0d0;
+    --button-bg: #032a4a;
+    --button-hover: #054a7d;
+    --alert-color: #ff3333;
+    --vault-locked: #00ff88;
+  }
+
+  body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* 📦 मुख्य कंसोल पैनल */
+  .console-panel {
+    width: 90vw;
+    height: 90vh;
+    background: var(--panel-color);
+    border: 2px solid var(--core-color);
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(79, 172, 254, 0.3);
+    display: grid;
+    grid-template-columns: 250px 1fr 250px;
+    grid-template-rows: 80px 1fr 120px;
+    gap: 15px;
+    padding: 15px;
+    position: relative;
+    backdrop-filter: blur(10px);
+  }
+
+  /* 🪐 FRIDAY CORE (Rotating 3D) */
+  .friday-core-container {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .friday-core {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 10%, var(--core-color) 40%, transparent 70%);
+    box-shadow: 0 0 60px var(--core-glow);
+    animation: core-pulse 3s infinite alternate;
+  }
+
+  .core-ring {
+    width: 280px;
+    height: 280px;
+    border: 3px solid var(--core-color);
+    border-radius: 50%;
+    position: absolute;
+    animation: core-rotate 8s infinite linear;
+  }
+
+  .core-ring:nth-child(2) {
+    width: 310px;
+    height: 310px;
+    animation: core-rotate 6s infinite linear reverse;
+  }
+
+  @keyframes core-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 60px var(--core-glow); }
+    100% { transform: scale(1.05); box-shadow: 0 0 90px var(--core-glow); }
+  }
+
+  @keyframes core-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* 🔴 EMERGENCY WAVEFORM */
+  .alert-waveform {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255, 51, 51, 0.2) 11px, rgba(255, 51, 51, 0.2) 12px);
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* 🛡️ MASTER VAULT STATUS */
+  .status-panel {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    background: var(--button-bg);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vault-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .status-led {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #555; /* Default: Locked */
+  }
+
+  .status-led.locked { background: var(--vault-locked); box-shadow: 0 0 15px var(--vault-locked); }
+
+  /* 🔘 3D NAVIGATION BUTTONS (16 Buttons Matrix) */
+  .nav-grid {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+  }
+
+  .console-btn {
+    background: var(--button-bg);
+    border: 1px solid var(--core-color);
+    color: var(--core-color);
+    padding: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .console-btn:hover {
+    background: var(--button-hover);
+    transform: translateY(-3px);
+    box-shadow: 5px 5px 15px rgba(79, 172, 254, 0.5);
+  }
+
+  .console-btn.critical {
+    border-color: var(--alert-color);
+    color: var(--alert-color);
+  }
+
+  .console-btn.critical:hover {
+    background: rgba(255, 51, 51, 0.2);
+    box-shadow: 0 0 15px var(--alert-color);
+  }
+
+</style>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">JARVIS OS V2.0</div>
-        <div class="grid">
-            <div class="btn" onclick="sendCmd('PON Port 1')">PON 1</div>
-            <div class="btn" onclick="sendCmd('PON Port 2')">PON 2</div>
-            <div class="btn" onclick="sendCmd('PON Port 3')">PON 3</div>
-            <div class="btn" onclick="sendCmd('PON Port 4')">PON 4</div>
-            <div class="btn" onclick="sendCmd('Health')">Health</div>
-            <div class="btn" onclick="sendCmd('OLT STATUS')">Status</div>
-            <div class="btn" onclick="sendCmd('🚀 Speed')">Speed</div>
-            <div class="btn" onclick="hideConsole()">EXIT</div>
-        </div>
-        <div id="terminal">
-            [ SYSTEM READY ]... WAITING FOR COMMAND<br>
-            <span id="logs"></span><span class="cursor"></span>
-        </div>
+
+<div class="alert-waveform" id="alertWaveform"></div>
+
+<div class="console-panel">
+  <div class="status-panel">
+    <h2>SYSTEM STATUS</h2>
+    <div class="vault-indicator">
+      <div class="status-led locked" id="vaultLED"></div>
+      <p>MASTER VAULT: <strong>LOCKED</strong></p>
     </div>
+    <div class="vault-indicator">
+      <div class="status-led locked"></div>
+      <p>SILENT GUARDIAN: ACTIVE</p>
+    </div>
+    <p>⚡ UPLINK: -17.5 dBm</p>
+    <p>🚨 ALARM: 2dB Drop (ACTIVE)</p>
+  </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
+  <div class="friday-core-container">
+    <div class="friday-core"></div>
+    <div class="core-ring"></div>
+    <div class="core-ring"></div>
+  </div>
 
-        function sendCmd(cmd) {
-            const logBox = document.getElementById('logs');
-            logBox.innerHTML += `<br>> Executing: ${cmd}...`;
-            
-            // Send data to Bot
-            tg.sendData(cmd);
-            
-            // NOTE: tg.close() removed to keep console open
-            logBox.innerHTML += `<br>> Data Sent! Check Telegram chat.`;
-            
-            // Auto-scroll terminal
-            const term = document.getElementById('terminal');
-            term.scrollTop = term.scrollHeight;
-        }
+  <div class="nav-grid">
+    <button class="console-btn">PON P1</button>
+    <button class="console-btn">PON P2</button>
+    <button class="console-btn">PON P3</button>
+    <button class="console-btn">PON P4</button>
+    <button class="console-btn">UPLINK</button>
+    <button class="console-btn">HEALTH</button>
+    <button class="console-btn">SPEED</button>
+    <button class="console-btn">STATS</button>
+    <button class="console-btn">ROGUE</button>
+    <button class="console-btn">SEARCH</button>
+    <button class="console-btn">SCAN P1</button>
+    <button class="console-btn">SCAN P2</button>
+    <button class="console-btn">CONFIRM</button>
+    <button class="console-btn">RESCAN</button>
+    <button class="console-btn critical">ALARM ON</button>
+    <button class="console-btn critical">EMERGENCY</button>
+  </div>
+</div>
 
-        function hideConsole() {
-            tg.close();
-        }
-    </script>
+<script>
+  // 🎙️ Friday's Activation Response (Voice)
+  window.onload = function() {
+    // यहाँ आप 'bot-9.py' से जनरेट किया हुआ वॉयस नोट प्ले करा सकते हैं
+    console.log("Friday Console Active.");
+  };
+
+  // 🚨 Emergency Siren (Example for critical buttons)
+  function triggerEmergencySiren() {
+    const waveform = document.getElementById('alertWaveform');
+    waveform.style.opacity = '1';
+    // 'bot-9.py' के trigger_red_alert को यहाँ कॉल करना होगा
+    setTimeout(() => { waveform.style.opacity = '0'; }, 3000);
+  }
+
+  // बस एक बटन के लिए डेमो
+  document.querySelectorAll('.console-btn.critical').forEach(btn => {
+    btn.addEventListener('click', triggerEmergencySiren);
+  });
+
+</script>
+
 </body>
 </html>
