@@ -1,61 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { background: #000; color: #00f2ff; font-family: 'Orbitron', sans-serif; overflow: hidden; }
-        
-        /* 🌀 Jarvis Core Animation */
-        .jarvis-core {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 120px; border: 4px solid #00f2ff;
-            border-radius: 50%; box-shadow: 0 0 30px #00f2ff;
-            animation: rotate 10s linear infinite;
-        }
-        @keyframes rotate { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+<title>FRIDAY AI Demo</title>
+<style>
+body{
+background:black;
+color:#00eaff;
+font-family:Arial;
+text-align:center;
+padding-top:100px;
+}
 
-        /* 🔘 Circular Buttons Setup */
-        .btn-container { position: relative; width: 300px; height: 300px; margin: 50px auto; }
-        .jarvis-btn {
-            position: absolute; width: 60px; height: 40px;
-            background: rgba(0, 242, 255, 0.1); border: 1px solid #00f2ff;
-            color: #00f2ff; font-size: 8px; border-radius: 5px; box-shadow: 0 0 10px #00f2ff;
-        }
-
-        /* Lightning Effect Background */
-        .lightning { position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,242,255,0.02); pointer-events: none; animation: flash 5s infinite; }
-        @keyframes flash { 0%, 90% {opacity:0} 95% {opacity:1} }
-    </style>
+button{
+padding:15px;
+font-size:18px;
+background:#00eaff;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+</style>
 </head>
+
 <body>
-    <div class="lightning"></div>
-    <div class="jarvis-core"></div>
-    
-    <div class="btn-container" id="btns">
-        </div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+<h1>🤖 FRIDAY AI DEMO</h1>
+<p>Say: "Hello Friday"</p>
 
-        const buttons = ["PON P1", "PON P2", "PON P3", "PON P4", "HEALTH", "SPEED", "ROGUE", "STATS"];
-        const container = document.getElementById('btns');
+<button onclick="start()">Start Listening</button>
 
-        // Buttons ko golai mein set karna
-        buttons.forEach((name, i) => {
-            let btn = document.createElement('button');
-            btn.className = 'jarvis-btn';
-            btn.innerText = name;
-            let angle = (i * 360 / buttons.length);
-            btn.style.left = (120 + 100 * Math.cos(angle * Math.PI / 180)) + "px";
-            btn.style.top = (120 + 100 * Math.sin(angle * Math.PI / 180)) + "px";
-            btn.onclick = () => {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Maalik, " + name + " report fetch ki ja rahi hai"));
-                tg.sendData(name); // Console band nahi hoga agar bot command handle kare
-            };
-            container.appendChild(btn);
-        });
-    </script>
+<p id="output"></p>
+
+<script>
+
+function start(){
+const recognition = new webkitSpeechRecognition();
+recognition.start();
+
+recognition.onresult = function(event){
+let text = event.results[0][0].transcript;
+document.getElementById("output").innerHTML =
+"You said: " + text;
+
+if(text.toLowerCase().includes("hello friday")){
+speak("Hello boss, how can I help you?");
+}
+}
+
+}
+
+function speak(msg){
+let speech = new SpeechSynthesisUtterance();
+speech.text = msg;
+speechSynthesis.speak(speech);
+}
+
+</script>
+
 </body>
 </html>
