@@ -2,75 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis Console v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jarvis OS v2.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #050a0f; color: #00f2ff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; overflow-x: hidden; }
-        .header { text-align: center; border-bottom: 2px solid #00f2ff; padding-bottom: 10px; margin-bottom: 20px; text-shadow: 0 0 10px #00f2ff; }
-        
-        /* 16 Button Grid */
-        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .btn { 
-            background: rgba(0, 242, 255, 0.1); border: 1px solid #00f2ff; color: #00f2ff;
-            padding: 12px 5px; font-size: 10px; text-align: center; border-radius: 5px;
-            cursor: pointer; transition: 0.3s; box-shadow: inset 0 0 5px #00f2ff;
-        }
-        .btn:active { background: #00f2ff; color: #000; transform: scale(0.95); }
-
-        /* Real Data Output Window */
-        .terminal { 
-            background: rgba(0,0,0,0.8); border: 2px solid #00f2ff; height: 200px; 
-            padding: 10px; overflow-y: auto; font-size: 12px; line-height: 1.5;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); border-radius: 5px;
-        }
-        .line { margin-bottom: 5px; border-left: 3px solid #00f2ff; padding-left: 8px; }
-        .system-msg { color: #ffcc00; }
+        :root { --neon: #00f3ff; --bg: #050a0f; }
+        body { background: var(--bg); color: white; font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow: hidden; }
+        .dashboard { border: 2px solid var(--neon); border-radius: 10px; padding: 15px; box-shadow: 0 0 20px rgba(0,243,255,0.2); height: 95vh; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 1px solid var(--neon); padding-bottom: 10px; margin-bottom: 15px; letter-spacing: 5px; color: var(--neon); font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex-shrink: 0; }
+        .btn { background: rgba(0,243,255,0.05); border: 1px solid var(--neon); color: var(--neon); padding: 12px; border-radius: 5px; text-align: center; font-size: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .btn:active { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); }
+        #terminal { margin-top: 15px; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 10px; font-size: 11px; flex-grow: 1; overflow-y: auto; color: #0f0; }
+        .cursor { display: inline-block; width: 8px; height: 15px; background: #0f0; animation: blink 1s infinite; vertical-align: middle; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div class="header"><h1>JARVIS OS v2.0</h1></div>
-
-    <div class="grid-container">
-        <div class="btn" onclick="sendCommand('PON Port 1')">🔌 PON 1</div>
-        <div class="btn" onclick="sendCommand('PON Port 2')">🔌 PON 2</div>
-        <div class="btn" onclick="sendCommand('PON Port 3')">🔌 PON 3</div>
-        <div class="btn" onclick="sendCommand('PON Port 4')">🔌 PON 4</div>
-        <div class="btn" onclick="sendCommand('🛡️ Rogue')">🛡️ ROGUE</div>
-        <div class="btn" onclick="sendCommand('📈 Health')">📈 HEALTH</div>
-        <div class="btn" onclick="sendCommand('🚀 Speed')">🚀 SPEED</div>
-        <div class="btn" onclick="sendCommand('📡 OLT STATUS')">📡 STATUS</div>
-        <div class="btn" onclick="sendCommand('📸 Photo')">📸 PHOTO</div>
-        <div class="btn" onclick="sendCommand('👥 On/Off')">👥 USERS</div>
-        <div class="btn" onclick="sendCommand('🛠️ Mon ON')">🛠️ MONITOR</div>
-        <div class="btn" onclick="sendCommand('🔍 Search')">🔍 SEARCH</div>
-        <div class="btn" onclick="sendCommand('⚡ Stats')">⚡ STATS</div>
-        <div class="btn" onclick="sendCommand('🛠️ Ticket')">🛠️ TICKET</div>
-        <div class="btn" onclick="sendCommand('📖 Guide')">📖 GUIDE</div>
-        <div class="btn" style="border-color: #ff4444;" onclick="Telegram.WebApp.close()">❌ CLOSE</div>
-    </div>
-
-    <div class="terminal" id="output">
-        <div class="line system-msg">> SYSTEM READY... WAITING FOR COMMAND</div>
+    <div class="dashboard">
+        <div class="header">JARVIS OS V2.0</div>
+        <div class="grid">
+            <div class="btn" onclick="sendCmd('PON Port 1')">PON 1</div>
+            <div class="btn" onclick="sendCmd('PON Port 2')">PON 2</div>
+            <div class="btn" onclick="sendCmd('PON Port 3')">PON 3</div>
+            <div class="btn" onclick="sendCmd('PON Port 4')">PON 4</div>
+            <div class="btn" onclick="sendCmd('Health')">Health</div>
+            <div class="btn" onclick="sendCmd('OLT STATUS')">Status</div>
+            <div class="btn" onclick="sendCmd('🚀 Speed')">Speed</div>
+            <div class="btn" onclick="hideConsole()">EXIT</div>
+        </div>
+        <div id="terminal">
+            [ SYSTEM READY ]... WAITING FOR COMMAND<br>
+            <span id="logs"></span><span class="cursor"></span>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
 
-        function sendCommand(cmd) {
-            const out = document.getElementById('output');
-            out.innerHTML += `<div class="line">> Executing: ${cmd}...</div>`;
-            out.scrollTop = out.scrollHeight;
+        function sendCmd(cmd) {
+            const logBox = document.getElementById('logs');
+            logBox.innerHTML += `<br>> Executing: ${cmd}...`;
             
-            // Bot ko signal bhejna
-            tg.sendData(cmd); 
+            // Send data to Bot
+            tg.sendData(cmd);
+            
+            // NOTE: tg.close() removed to keep console open
+            logBox.innerHTML += `<br>> Data Sent! Check Telegram chat.`;
+            
+            // Auto-scroll terminal
+            const term = document.getElementById('terminal');
+            term.scrollTop = term.scrollHeight;
         }
 
-        // Future update: Bot se data receive karne ke liye
-        tg.onEvent('mainButtonClicked', function(){
-            // Logic for real-time sync
-        });
+        function hideConsole() {
+            tg.close();
+        }
     </script>
 </body>
 </html>
