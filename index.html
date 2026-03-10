@@ -1,81 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FRIDAY Console</title>
+    <title>FRIDAY CORE v9.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow-x: hidden; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        
-        /* Status Card - Compact for Mobile */
-        .status-card {
-            border: 2px solid #00f2ff; padding: 10px; width: 95%; 
-            border-radius: 10px; box-shadow: 0 0 15px #00f2ff; margin-bottom: 20px;
-            font-size: 12px; background: rgba(0, 242, 255, 0.05);
+        /* 🌌 Friday Cinematic Theme */
+        body { 
+            background: #000; color: #00f2ff; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 10px; overflow-x: hidden;
         }
-        
-        /* Button Grid - Responsive */
-        .grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; width: 100%; max-width: 400px;
+
+        /* 📱 Status Screen (Real-Data View) */
+        .friday-display {
+            border: 2px solid #00f2ff; border-radius: 15px; padding: 15px;
+            background: rgba(0, 242, 255, 0.05); margin-bottom: 20px;
+            box-shadow: inset 0 0 20px #00f2ff, 0 0 10px #00f2ff;
+            min-height: 180px; overflow-y: auto;
         }
+
+        h2 { font-size: 16px; margin: 0 0 10px 0; text-align: center; border-bottom: 1px solid #00f2ff; padding-bottom: 5px; }
+
+        /* 📊 Real-Time Table Style */
+        .olt-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .olt-table th { color: #00f2ff; border-bottom: 1px solid #00f2ff; padding: 5px; text-align: left; }
+        .olt-table td { padding: 8px 5px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
+        
+        .pwr-good { color: #00ff00; font-weight: bold; }
+        .pwr-bad { color: #ff4444; font-weight: bold; text-shadow: 0 0 5px #ff4444; }
+
+        /* 🔘 16-Button Grid (Perfect Mobile Fit) */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         
         button {
-            background: transparent; border: 1px solid #00f2ff; color: #00f2ff;
-            padding: 12px 5px; font-size: 10px; border-radius: 5px;
-            cursor: pointer; transition: 0.3s; text-transform: uppercase;
+            background: rgba(0, 0, 0, 0.8); border: 1px solid #00f2ff; color: #00f2ff;
+            padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: bold;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
         }
-        
-        button:active { background: #00f2ff; color: #000; box-shadow: 0 0 20px #00f2ff; }
 
-        /* Logs Output */
-        #log-screen {
-            width: 95%; height: 80px; background: #050505; border: 1px solid #333;
-            margin-top: 20px; padding: 5px; font-size: 10px; color: #0f0; overflow-y: auto;
-        }
+        button:active { background: #00f2ff; color: #000; box-shadow: 0 0 20px #00f2ff; transform: scale(0.95); }
+
+        /* 📡 Loader Overlay */
+        #loader { display: none; text-align: center; font-size: 12px; margin-top: 20px; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="status-card">
-            <h3 style="margin:0 0 10px 0; text-align:center;">SYSTEM STATUS</h3>
-            <div>• VAULT: <span style="color:#0f0">LOCKED</span></div>
-            <div>• GUARDIAN: <span style="color:#0f0">ACTIVE</span></div>
-            <div>• UPLINK: -17.5 dBm</div>
-        </div>
 
-        <div class="grid">
-            <button onclick="sendCmd('PON P1')">PON P1</button>
-            <button onclick="sendCmd('PON P2')">PON P2</button>
-            <button onclick="sendCmd('PON P3')">PON P3</button>
-            <button onclick="sendCmd('PON P4')">PON P4</button>
-            <button onclick="sendCmd('HEALTH')">HEALTH</button>
-            <button onclick="sendCmd('SPEED')">SPEED</button>
-            <button onclick="sendCmd('STATS')">STATS</button>
-            <button onclick="sendCmd('ROGUE')">ROGUE</button>
-            <button onclick="sendCmd('SEARCH')">SEARCH</button>
-            <button onclick="sendCmd('SCAN P1')">SCAN P1</button>
-            <button onclick="sendCmd('SCAN P2')">SCAN P2</button>
-            <button onclick="sendCmd('CONFIRM')">CONFIRM</button>
-            <button onclick="sendCmd('RESCAN')">RESCAN</button>
-            <button onclick="sendCmd('ALARM')">ALARM</button>
-            <button onclick="sendCmd('EMERGENCY')">EMERGENCY</button>
-            <button onclick="sendCmd('MASTER')">MASTER</button>
+    <div class="friday-display">
+        <h2 id="title">SYSTEM: STANDBY</h2>
+        <div id="content">
+            <p style="text-align:center; color:rgba(0,242,255,0.4); margin-top:40px;">मालिक, हुक्म कीजिये। सिस्टम तैयार है।</p>
         </div>
+        <div id="loader">🛰️ SYNCING WITH OLT...</div>
+    </div>
 
-        <div id="log-screen">Ready for commands...</div>
+    <div class="grid">
+        <button onclick="execute('PON Port 1')">PON P1</button>
+        <button onclick="execute('PON Port 2')">PON P2</button>
+        <button onclick="execute('PON Port 3')">PON P3</button>
+        <button onclick="execute('PON Port 4')">PON P4</button>
+        
+        <button onclick="execute('📈 Health')">Health</button>
+        <button onclick="execute('🚀 Speed')">Speed</button>
+        <button onclick="execute('🛡️ Rogue')">Rogue</button>
+        <button onclick="execute('📡 OLT STATUS')">OLT Status</button>
+        
+        <button onclick="execute('🔍 Search')">Search</button>
+        <button onclick="execute('📸 Photo')">Photo</button>
+        <button onclick="execute('👥 On/Off')">Users</button>
+        <button onclick="execute('⚡ Stats')">Stats</button>
+        
+        <button onclick="execute('🛠️ Ticket')">Ticket</button>
+        <button onclick="execute('📖 Guide')">Guide</button>
+        <button onclick="execute('🔙 Change OLT')">Switch</button>
+        <button onclick="execute('RESCAN')">Rescan</button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Full screen setup
+        tg.expand();
 
-        function sendCmd(cmd) {
-            document.getElementById('log-screen').innerHTML += "<br>> Executing: " + cmd;
-            // Sending data to Python Bot
-            tg.sendData(cmd); 
+        function execute(cmd) {
+            // 1. Send command to Python Bot
+            tg.sendData(cmd);
+            
+            // 2. UI Updates
+            document.getElementById('title').innerText = "EXECUTING: " + cmd;
+            document.getElementById('content').innerHTML = "";
+            document.getElementById('loader').style.display = "block";
+            
+            // Logic to handle auto-ui update if bot sends JSON back
+            // (Note: Bot will reply in Telegram chat, but UI stays open)
+        }
+
+        // Table Builder Function (Called when real data is ready)
+        function buildTable(jsonData) {
+            document.getElementById('loader').style.display = "none";
+            let data = JSON.parse(jsonData);
+            let html = `<table class='olt-table'>
+                <tr><th>ID</th><th>RX(dBm)</th><th>DESC</th></tr>`;
+            
+            data.rows.forEach(row => {
+                let pwrClass = parseFloat(row.rx) < -25 ? "pwr-bad" : "pwr-good";
+                html += `<tr>
+                    <td>${row.id}</td>
+                    <td class="${pwrClass}">${row.rx}</td>
+                    <td>${row.desc}</td>
+                </tr>`;
+            });
+            
+            html += "</table>";
+            document.getElementById('content').innerHTML = html;
+            document.getElementById('title').innerText = data.title + " REPORT";
         }
     </script>
 </body>
