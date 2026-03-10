@@ -4,57 +4,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; overflow: hidden; margin: 0; }
+        body { background: #000; color: #00f2ff; font-family: 'Orbitron', sans-serif; overflow: hidden; }
         
-        /* ⚡ Lightning Effect */
-        .lightning {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(0, 242, 255, 0.05));
-            pointer-events: none; animation: flash 4s infinite;
+        /* 🌀 Jarvis Core Animation */
+        .jarvis-core {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 120px; border: 4px solid #00f2ff;
+            border-radius: 50%; box-shadow: 0 0 30px #00f2ff;
+            animation: rotate 10s linear infinite;
         }
-        @keyframes flash { 0%, 90%, 100% { opacity: 0; } 92% { opacity: 1; } }
+        @keyframes rotate { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        .console-box { border: 2px solid #00f2ff; margin: 10px; padding: 15px; border-radius: 15px; box-shadow: 0 0 20px #00f2ff; height: 200px; overflow-y: auto; background: rgba(0,0,0,0.8); }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
-        button { background: transparent; border: 1px solid #00f2ff; color: #00f2ff; padding: 12px; border-radius: 8px; font-size: 10px; box-shadow: 0 0 5px #00f2ff; }
-        button:active { background: #00f2ff; color: #000; }
+        /* 🔘 Circular Buttons Setup */
+        .btn-container { position: relative; width: 300px; height: 300px; margin: 50px auto; }
+        .jarvis-btn {
+            position: absolute; width: 60px; height: 40px;
+            background: rgba(0, 242, 255, 0.1); border: 1px solid #00f2ff;
+            color: #00f2ff; font-size: 8px; border-radius: 5px; box-shadow: 0 0 10px #00f2ff;
+        }
+
+        /* Lightning Effect Background */
+        .lightning { position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,242,255,0.02); pointer-events: none; animation: flash 5s infinite; }
+        @keyframes flash { 0%, 90% {opacity:0} 95% {opacity:1} }
     </style>
 </head>
 <body>
     <div class="lightning"></div>
-    <div class="console-box">
-        <h3 id="title" style="text-align:center; font-size:14px;">FRIDAY CORE v10</h3>
-        <div id="output" style="font-size:11px;">System Initialized. Awaiting Command...</div>
-    </div>
-
-    <div class="grid">
-        <button onclick="sendCmd('PON Port 1')">PON P1</button>
-        <button onclick="execute('HEALTH')">HEALTH</button>
-        <button onclick="execute('SPEED')">SPEED</button>
+    <div class="jarvis-core"></div>
+    
+    <div class="btn-container" id="btns">
         </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function speak(text) {
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = text;
-            msg.lang = 'hi-IN'; // Hindi Voice
-            window.speechSynthesis.speak(msg);
-        }
+        const buttons = ["PON P1", "PON P2", "PON P3", "PON P4", "HEALTH", "SPEED", "ROGUE", "STATS"];
+        const container = document.getElementById('btns');
 
-        function sendCmd(cmd) {
-            document.getElementById('output').innerHTML = "Scanning OLT Data...";
-            speak("Maalik, Bal Jattan OLT se data fetch kiya ja raha hai.");
-            // WebApp ko bina band kiye data bhejney ke liye
-            fetch(`https://your-server-link.com/api?cmd=${cmd}`); 
-        }
-
-        // Simulating incoming data from bot
-        function updateUI(data) {
-            document.getElementById('output').innerHTML = data;
-        }
+        // Buttons ko golai mein set karna
+        buttons.forEach((name, i) => {
+            let btn = document.createElement('button');
+            btn.className = 'jarvis-btn';
+            btn.innerText = name;
+            let angle = (i * 360 / buttons.length);
+            btn.style.left = (120 + 100 * Math.cos(angle * Math.PI / 180)) + "px";
+            btn.style.top = (120 + 100 * Math.sin(angle * Math.PI / 180)) + "px";
+            btn.onclick = () => {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Maalik, " + name + " report fetch ki ja rahi hai"));
+                tg.sendData(name); // Console band nahi hoga agar bot command handle kare
+            };
+            container.appendChild(btn);
+        });
     </script>
 </body>
 </html>
